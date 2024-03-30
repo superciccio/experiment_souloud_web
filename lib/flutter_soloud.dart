@@ -12,6 +12,13 @@ external int initEngine();
 @JS('Module._isInited')
 external int isInited();
 
+/// The C function is declared as following:
+/// int loadWaveform(
+///        int waveform,
+///        bool superWave,
+///        float scale,
+///        float detune,
+///        unsigned int *hash)
 @JS('Module._loadWaveform')
 external int loadWaveform(
     int waveform, bool superWave, double scale, double detune, JSInt32Array hash);
