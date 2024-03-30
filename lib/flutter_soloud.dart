@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'dart:typed_data';
 
 // import 'package:web/web.dart' as web;
 
@@ -21,7 +22,7 @@ external int isInited();
 ///        unsigned int *hash)
 @JS('Module._loadWaveform')
 external int loadWaveform(
-    int waveform, bool superWave, double scale, double detune, JSInt32Array hash);
+    int waveform, bool superWave, double scale, double detune, JSUint32Array hash);
 
 @JS('Module._play')
 external int play(int soundHash, double volume, double pan, bool paused,
@@ -39,7 +40,7 @@ class FlutterSoloud {
     var result = initEngine();
     debugPrint('***************** $result');
 
-    JSInt32Array h = Int32List(1).toJS;
+    JSUint32Array h = Uint32List(1).toJS;
     result = loadWaveform(1, true, 0.25, 1, h);
     debugPrint('***************** $result  $h');
     result = loadWaveform(2, true, 0.25, 1, h);
