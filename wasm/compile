@@ -2,5 +2,41 @@
 rm -r build
 mkdir build
 cd build
-emcmake cmake ..
-emmake make -j30
+#emcmake cmake ..
+#emmake make -j30
+
+#https://emscripten.org/docs/tools_reference/emcc.html
+#-g3 #keep debug info, including JS whitespace, function names
+#-sSTACK_SIZE=1048576 -sALLOW_MEMORY_GROWTH
+
+rm ../../example/web/libflutter_soloud_plugin.*
+
+emcc \
+-I ../../src -I ../../src/filters -I ../../src/synth -I ../../src/soloud/include \
+-I ../../src/soloud/src -I ../../src/soloud/include \
+../../src/soloud/src/core/*.c* \
+../../src/soloud/src/filter/*.c* \
+../../src/soloud/src/backend/miniaudio/*.c* \
+../../src/soloud/src/audiosource/ay/*.c* \
+../../src/soloud/src/audiosource/speech/*.c* \
+../../src/soloud/src/audiosource/wav/*.c* \
+../../src/common.cpp \
+../../src/bindings.cpp \
+../../src/player.cpp \
+../../src/analyzer.cpp \
+../../src/bindings_capture.cpp \
+../../src/capture.cpp \
+../../src/synth/basic_wave.cpp \
+../../src/filters/filters.cpp \
+-O3 -D WITH_MINIAUDIO -s "EXPORTED_FUNCTIONS=['_free', '_malloc']" \
+--shell-file ../html_template.html \
+-I ~/.emscripten_cache/sysroot/include \
+-s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" \
+-s EXPORT_ALL=1 -s NO_EXIT_RUNTIME=1 \
+-g3 \
+-sSTACK_SIZE=8388608 -sALLOW_MEMORY_GROWTH \
+-o ../../example/web/libflutter_soloud_plugin.js
+
+#emcc -o main.html ../../src/main.c --shell-file ../html_template.html \
+#-I ~/.emscripten_cache/sysroot/include \
+#-s EXPORT_ALL=1 -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall']"
