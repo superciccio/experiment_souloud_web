@@ -1,8 +1,10 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:flutter_soloud/sound_hash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _flutterSoloudPlugin = FlutterSoloud();
+  int soundHash = 0;
 
   @override
   void initState() {
@@ -63,7 +66,44 @@ class _MyAppState extends State<MyApp> {
                   _flutterSoloudPlugin.init();
                 },
                 child: const Text('init'),
-              )
+              ),
+              OutlinedButton(
+                onPressed: () async{
+                  var sound = await _flutterSoloudPlugin.loadWaveform();
+                  soundHash = sound.soundHash.hash;
+                },
+                child: const Text('load waveform'),
+              ),
+              OutlinedButton(
+                onPressed: () async {
+                  final result = await FilePicker.platform
+                      .pickFiles(type: FileType.any, allowMultiple: false);
+
+                  if (result != null && result.files.isNotEmpty) {
+                    final fileBytes = result.files.first.bytes;
+                    final fileName = result.files.first.name;
+
+                    var sound = await _flutterSoloudPlugin.loadMem(
+                      fileName,
+                      fileBytes!,
+                    );
+                    soundHash = sound.soundHash.hash;
+                  }
+                },
+                child: const Text('load mem'),
+              ),
+              OutlinedButton(
+                onPressed: () {
+                  _flutterSoloudPlugin.play(soundHash);
+                },
+                child: const Text('play'),
+              ),
+              OutlinedButton(
+                onPressed: () {
+                  _flutterSoloudPlugin.dispose();
+                },
+                child: const Text('dispose'),
+              ),
             ],
           ),
         ),
