@@ -103,7 +103,7 @@ const std::string Player::getErrorString(PlayerErrors errorCode) const
 }
 
 PlayerErrors Player::loadFile(
-    const std::string &completeFileName, 
+    const std::string &completeFileName,
     bool loadIntoMem, 
     unsigned int &hash)
 {
@@ -139,6 +139,45 @@ PlayerErrors Player::loadFile(
         sounds.back().get()->soundType = TYPE_WAVSTREAM;
         result = static_cast<SoLoud::WavStream*>(sounds.back().get()->sound.get())->load(completeFileName.c_str());
     }
+
+    if (result != SoLoud::SO_NO_ERROR)
+    {
+        sounds.pop_back();
+    }
+    return (PlayerErrors)result;
+}
+
+PlayerErrors Player::loadMem(
+    const std::string &uniqueName,
+    unsigned char *mem, 
+    int length,
+    unsigned int &hash)
+{
+    if (!mInited)
+        return backendNotInited;
+
+    hash = 0;
+
+    unsigned int newHash = (unsigned int)std::hash<std::string>{}(uniqueName);
+    /// check if the sound has been already loaded
+    auto const &s = std::find_if(
+        sounds.begin(), sounds.end(),
+        [&](std::unique_ptr<ActiveSound> const &f)
+        { return f->soundHash == newHash; });
+
+    if (s != sounds.end()) {
+        hash = newHash;
+        return fileAlreadyLoaded;
+    }
+
+    sounds.push_back(std::make_unique<ActiveSound>());
+    sounds.back().get()->completeFileName = std::string(uniqueName);
+    hash = sounds.back().get()->soundHash = newHash;
+    
+    SoLoud::result result;
+        sounds.back().get()->sound = std::make_unique<SoLoud::Wav>();
+        sounds.back().get()->soundType = TYPE_WAV;
+        result = static_cast<SoLoud::Wav*>(sounds.back().get()->sound.get())->loadMem(mem, length, true, true);
 
     if (result != SoLoud::SO_NO_ERROR)
     {
