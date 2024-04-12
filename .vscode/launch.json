@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "chrome",
+            "program": "${workspaceRoot}/example/lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": ["--web-port", "8080", "--web-hostname","127.0.0.1", "--disable-web-security --disable-gpu --user-data-dir=~/chromeTemp"]
+        },
+        {
             "name": "example",
             "cwd": "example",
             "request": "launch",
