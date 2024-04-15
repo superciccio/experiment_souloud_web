@@ -15,9 +15,9 @@ import 'package:flutter_soloud/enums.dart';
 /// import the appropriate bindings: the current SoLoudController for all
 /// but web, and this for web.
 ///
-/// AudioIsolate should use an abstract class for Isolate, SendPort, 
-/// ReceivePort, Isolate.spawn, Isolate.kill
-/// be rewritten using web.Worker
+/// AudioIsolate should use an abstract class that implements Isolate, SendPort, 
+/// ReceivePort, Isolate.spawn, Isolate.kill logic and the same 
+/// functionalities for a web worker.
 ///
 ///
 
