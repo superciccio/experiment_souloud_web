@@ -3,7 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/audio_source.dart';
 import 'package:flutter_soloud/sound_hash.dart';
-import 'package:flutter_soloud/bindings_player_web_ffi.dart' as module;
+import 'package:flutter_soloud/bindings_player_web_ffi.dart';
 import 'package:flutter_soloud/enums.dart';
 
 import 'flutter_soloud_platform_interface.dart';
@@ -14,32 +14,36 @@ class FlutterSoloud {
   }
 
   PlayerErrors init() {
-    final ret = PlayerErrors.values[module.initEngine()];
+    final ret = PlayerErrors.values[JSSoloud.initEngine()];
     debugPrint('***************** INIT result: $ret');
     return ret;
   }
 
   bool isInited() {
-    return module.isInited() == 1 ? true : false;
+    return JSSoloud.isInited() == 1 ? true : false;
   }
 
-  /// On web reading a local file is not possible. Use [loadMem] instead
+  void deinit() {
+    JSSoloud.deinit();
+  }
+
+  /// Reading a local file on web is not possible. Use [loadMem] instead
   Future<AudioSource> loadFile(
     String path, {
     LoadMode mode = LoadMode.memory,
   }) async {
-    final hashPtr = module.malloc(4); // 4 bytes for an int
-    final pathPtr = module.malloc(path.length);
-    final result = module.loadFile(
+    final hashPtr = JSSoloud.malloc(4); // 4 bytes for an int
+    final pathPtr = JSSoloud.malloc(path.length);
+    final result = JSSoloud.loadFile(
       pathPtr,
       mode == LoadMode.memory ? true : false,
       hashPtr,
     );
 
     /// "*" means unsigned int 32
-    final hash = module.getValue(hashPtr, '*');
-    module.free(hashPtr);
-    module.free(pathPtr);
+    final hash = JSSoloud.getValue(hashPtr, '*');
+    JSSoloud.free(hashPtr);
+    JSSoloud.free(pathPtr);
 
     return AudioSource(SoundHash(hash));
   }
@@ -48,16 +52,16 @@ class FlutterSoloud {
   /// as [bytes].
   /// Here the [path] is used only as a reference to compute its hash.
   Future<AudioSource> loadMem(String path, Uint8List bytes) async {
-    final hashPtr = module.malloc(4); // 4 bytes for an int
-    final bytesPtr = module.malloc(bytes.length);
-    final pathPtr = module.malloc(path.length);
+    final hashPtr = JSSoloud.malloc(4); // 4 bytes for an int
+    final bytesPtr = JSSoloud.malloc(bytes.length);
+    final pathPtr = JSSoloud.malloc(path.length);
     for (var i = 0; i < bytes.length; i++) {
-      module.setValue(bytesPtr + i, bytes[i], 'i8');
+      JSSoloud.setValue(bytesPtr + i, bytes[i], 'i8');
     }
     for (var i = 0; i < path.length; i++) {
-      module.setValue(pathPtr + i, path.codeUnits[i], 'i8');
+      JSSoloud.setValue(pathPtr + i, path.codeUnits[i], 'i8');
     }
-    final result = module.loadMem(
+    final result = JSSoloud.loadMem(
       pathPtr,
       bytesPtr,
       bytes.length,
@@ -65,11 +69,11 @@ class FlutterSoloud {
     );
 
     /// "*" means unsigned int 32
-    final hash = module.getValue(hashPtr, '*');
+    final hash = JSSoloud.getValue(hashPtr, '*');
 
-    module.free(hashPtr);
-    module.free(bytesPtr);
-    module.free(pathPtr);
+    JSSoloud.free(hashPtr);
+    JSSoloud.free(bytesPtr);
+    JSSoloud.free(pathPtr);
     debugPrint(
         '***************** LOADMEM result: $result  hashPtr: $hashPtr  hash: $hash');
 
@@ -78,30 +82,26 @@ class FlutterSoloud {
   }
 
   Future<AudioSource> loadWaveform() async {
-    final hashPtr = module.malloc(4); // 4 bytes for an int
-    final result = module.loadWaveform(0, true, 0.25, 1, hashPtr);
+    final hashPtr = JSSoloud.malloc(4); // 4 bytes for an int
+    final result = JSSoloud.loadWaveform(0, true, 0.25, 1, hashPtr);
 
     /// "*" means unsigned int 32
-    var hash = module.getValue(hashPtr, '*');
+    var hash = JSSoloud.getValue(hashPtr, '*');
     debugPrint(
         '***************** WAVEFORM result: $result  hashPtr: $hashPtr  hash: $hash');
-    module.free(hashPtr);
+    JSSoloud.free(hashPtr);
     return AudioSource(SoundHash(hash));
   }
 
   void play(int soundHash) {
-    final handlePtr = module.malloc(4); // 4 bytes for an int
+    final handlePtr = JSSoloud.malloc(4); // 4 bytes for an int
     final result =
-        module.play(soundHash, 0.2, 0.0, false, true, 0.0, handlePtr);
+        JSSoloud.play(soundHash, 0.2, 0.0, false, true, 0.0, handlePtr);
 
     /// "*" means unsigned int 32
-    final handle = module.getValue(handlePtr, '*');
+    final handle = JSSoloud.getValue(handlePtr, '*');
     debugPrint('***************** PLAY soundHash: $soundHash  result: $result  '
         'handlePtr: $handlePtr  handle: $handle');
-    module.free(handlePtr);
-  }
-
-  void dispose() {
-    module.dispose();
+    JSSoloud.free(handlePtr);
   }
 }

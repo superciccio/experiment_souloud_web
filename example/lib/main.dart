@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('init'),
               ),
               OutlinedButton(
-                onPressed: () async{
+                onPressed: () async {
                   var sound = await _flutterSoloudPlugin.loadWaveform();
                   soundHash = sound.soundHash.hash;
                 },
@@ -100,7 +100,7 @@ class _MyAppState extends State<MyApp> {
               ),
               OutlinedButton(
                 onPressed: () {
-                  _flutterSoloudPlugin.dispose();
+                  _flutterSoloudPlugin.deinit();
                 },
                 child: const Text('dispose'),
               ),

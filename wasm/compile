@@ -11,7 +11,8 @@ cd build
 
 rm ../../example/web/libflutter_soloud_plugin.*
 
-emcc \
+# https://emscripten.org/docs/tools_reference/settings_reference.html
+em++ \
 -I ../../src -I ../../src/filters -I ../../src/synth -I ../../src/soloud/include \
 -I ../../src/soloud/src -I ../../src/soloud/include \
 ../../src/soloud/src/core/*.c* \
@@ -28,13 +29,14 @@ emcc \
 ../../src/capture.cpp \
 ../../src/synth/basic_wave.cpp \
 ../../src/filters/filters.cpp \
--O3 -D WITH_MINIAUDIO -s "EXPORTED_FUNCTIONS=['_free', '_malloc']" \
---shell-file ../html_template.html \
+-O3 -D WITH_MINIAUDIO \
 -I ~/.emscripten_cache/sysroot/include \
 -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" \
+-s "EXPORTED_FUNCTIONS=['_free', '_malloc']" \
 -s EXPORT_ALL=1 -s NO_EXIT_RUNTIME=1 \
--g3 \
--sSTACK_SIZE=8388608 -sALLOW_MEMORY_GROWTH \
+--shell-file ../html_template.html \
+-s DEFAULT_TO_CXX \
+-s STACK_SIZE=1048576 -s ALLOW_MEMORY_GROWTH \
 -o ../../example/web/libflutter_soloud_plugin.js
 
 #emcc -o main.html ../../src/main.c --shell-file ../html_template.html \

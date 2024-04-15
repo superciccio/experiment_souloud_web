@@ -1,4 +1,3 @@
-#include <emscripten/emscripten.h>
 
 #include "player.h"
 #include "analyzer.h"
