@@ -1,9 +1,7 @@
 import 'package:disposing/disposing.dart';
 import 'package:flutter_soloud_example/worker/web_worker_method_channel.dart';
 import 'package:flutter_soloud_example/worker/worker.dart';
-import 'package:meta/meta.dart';
 
-@internal
 WebWorkerMethodChannel getWebWorkerMethodChannel(
         {required String scriptURL, Worker? worker}) =>
     WebWorkerMethodChannelStub();
