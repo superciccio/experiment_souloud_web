@@ -25,8 +25,14 @@ dependencies:
     # the parent directory to use the current plugin's version.
     path: ../
 
+  #worker_method_channel:
+  #    path: ../../flutter_util_packages/packages/worker_method_channel
 
   file_picker: ^8.0.0+1
+  platform_info: ^4.0.2
+  logger: ^2.2.0
+  disposing: ^1.0.3+1
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
